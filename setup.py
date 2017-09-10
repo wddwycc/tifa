@@ -43,9 +43,9 @@ class PublishCommand(Command):
 
 setup(
     name='tifa',
-    version='0.1.2',
+    version='0.1.3',
     packages=['tifa'],
-    install_requires=['click'],
+    install_requires=['click==6.7', 'Jinja2==2.9.6'],
     include_package_data=True,
     entry_points={
         'console_scripts': [
