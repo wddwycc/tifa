@@ -1,0 +1,21 @@
+import click
+from flask.cli import FlaskGroup
+
+
+def _create_flask_app(_):
+    from {{ name }} import create_app
+    return create_app()
+
+
+@click.group(cls=FlaskGroup, create_app=_create_flask_app)
+def cli():
+    pass
+
+
+@cli.command(help='Hello World')
+def hello():
+    print('Hello world')
+
+
+if __name__ == '__main__':
+    cli()

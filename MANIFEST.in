@@ -1,0 +1,3 @@
+include LICENSE README.md
+recursive-include tifa/templates *
+recursive-exclude tifa/templates *.pyc .DS_Store
