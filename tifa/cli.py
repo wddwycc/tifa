@@ -25,7 +25,6 @@ def proj_min(name):
     shutil.copytree(template_dir, './{}'.format(name))
 
     def replace_file(file):
-        print(file)
         filename = os.path.split(file)[1]
         suffix = filename.split('.')[-1]
         if filename in ['.DS_Store']:
