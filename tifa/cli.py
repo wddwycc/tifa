@@ -28,6 +28,8 @@ def proj_min(name):
         print(file)
         filename = os.path.split(file)[1]
         suffix = filename.split('.')[-1]
+        if filename in ['.DS_Store']:
+            return
         with open(file, 'r+') as f:
             template = Template(f.read())
             content = template.render(name=name) + '\n'
