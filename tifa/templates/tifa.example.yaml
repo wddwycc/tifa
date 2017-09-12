@@ -1,0 +1,8 @@
+name: {{ name }}
+routes:
+  - front
+  - api
+db:
+  - user
+  - seller
+webpack: false

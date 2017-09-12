@@ -15,8 +15,20 @@ $ pip install tifa
 
 ## Usage
 
-### Start a minimum flask app
+### Generate a tifa configuration file
 
 ```
-$ tifa min
+$ tifa init
+```
+
+### Initialize project through configuration
+
+```
+$ tifa gen
+```
+
+This command would read `tifa.yaml` by default. To use a specific config file: 
+
+```
+$ tifa gen --config path/to/config.yaml
 ```
