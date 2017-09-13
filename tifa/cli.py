@@ -5,9 +5,10 @@ import click
 from jinja2 import Template as JTemplate
 
 from tifa.errors import ValidationError
+from tifa.file import Folder, File, Template
+from tifa.filters import under_score
+from tifa.prompt import Prompt
 from tifa.validates import validate_config
-from .file import Folder, File, Template
-from .prompt import Prompt
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -29,6 +30,7 @@ def init(name):
         f.seek(0)
         f.truncate()
         f.write(content)
+    Prompt.success('Created tifa.yaml')
 
 
 @main.command(help='Generate project through configuration')
@@ -52,7 +54,14 @@ def gen(config):
         Prompt.warn('ops, project folder name has been used')
         return
 
-    module_folders = []
+    requirements = [
+        'click == 6.7',
+        'Flask == 0.12.2',
+        'Jinja2 == 2.9.6',
+    ]
+
+    # todo: move template gen logic to another file
+    module_folders = list()
     if routes:
         files = [File(
             name='{}.py'.format(route),
@@ -67,11 +76,22 @@ def gen(config):
             )
         )
         module_folders.append(Folder(name='routes', files=files))
-
-    root_files = [
-        File(name='manage.py', origin='manage.py.j2', params=dict(name=name)),
-        File(name='requirements.txt', origin='requirements.txt'),
-    ]
+    if db:
+        # todo: check same table name & check no name called base
+        files = [File(
+            name='{}.py'.format(under_score(name)),
+            origin='db/table.py.j2',
+            params=dict(cls_name=name, table_name=under_score(name))
+        ) for name in db]
+        files += [
+            File(name='__init__.py', origin='db/__init__.py.j2'),
+            File(name='base.py', origin='db/base.py.j2'),
+        ]
+        module_folders.append(Folder(name='db', files=files))
+        requirements += [
+            'SQLAlchemy==1.1.14',
+            'Flask-SQLAlchemy==2.2',
+        ]
 
     module_folder = Folder(
         name=name, sub_folders=module_folders,
@@ -80,11 +100,17 @@ def gen(config):
         ]
     )
 
-    template = Template(
+    proj_files = [
+        File(name='manage.py', origin='manage.py.j2', params=dict(name=name)),
+    ]
+
+    proj_folder = Template(
         name=name,
-        sub_folders=[
-            module_folder
-        ],
-        files=root_files)
-    template.render('./')
+        sub_folders=[module_folder],
+        files=proj_files,
+        requirements=requirements,
+    )
+
+    proj_folder.render('./')
+
     Prompt.success('project {} generated, enjoy coding'.format(name))

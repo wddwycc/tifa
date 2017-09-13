@@ -43,4 +43,15 @@ class File(object):
 
 
 class Template(Folder):
-    pass
+    def __init__(self, name, requirements, sub_folders=None, files=None):
+        super(Template, self).__init__(
+            name, sub_folders=sub_folders, files=files
+        )
+        self.requirements = requirements
+
+    def render(self, path):
+        super(Template, self).render(path)
+        req = '\n'.join(self.requirements)
+        req_path = os.path.join(path, '{}/requirements.txt'.format(self.name))
+        with open(req_path, 'w') as f:
+            f.write(req + '\n')

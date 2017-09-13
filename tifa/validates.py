@@ -12,7 +12,8 @@ from tifa.errors import ValidationError
 def _config_scheme():
     return Schema({
         Required('name'): All(str, Length(min=1)),
-        Optional('routes'): All()
+        Optional('routes'): All(list),
+        Optional('db'): All(list),
     }, extra=REMOVE_EXTRA)
 
 

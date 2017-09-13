@@ -43,7 +43,7 @@ class PublishCommand(Command):
 
 setup(
     name='tifa',
-    version='0.1.4',
+    version='0.1.5',
     packages=['tifa'],
     install_requires=[
         'click==6.7',
@@ -71,7 +71,6 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
