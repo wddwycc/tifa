@@ -1,0 +1,9 @@
+{% for route in routes %}
+from . import {{ route }}
+{% endfor %}
+
+
+def init_app(app):
+{% for route in routes %}
+    app.register_blueprint({{ route }}.bp, url_prefix='{{ '' if route == 'front' else '/' + route }}')
+{% endfor -%}
