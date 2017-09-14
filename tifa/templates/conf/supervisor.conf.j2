@@ -1,0 +1,14 @@
+[program:{{ name }}]
+user=ubuntu
+command=/var/venv/{{ name }}/bin/gunicorn -c  ./conf/gunicorn_conf.py wsgi:app
+directory=/code/{{ name }}
+autostart=true
+autorestart=true
+stopsignal=TERM
+
+stdout_logfile=/var/log/supervisor/akame.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=5
+redirect_stderr=true
+stopwaitsecs=60
+killasgroup=true

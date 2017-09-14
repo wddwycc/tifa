@@ -10,10 +10,11 @@ from tifa.errors import ValidationError
 
 
 def _config_scheme():
+    # todo: disable captical of name
     return Schema({
         Required('name'): All(str, Length(min=1)),
         Optional('routes'): All(list),
-        Optional('db'): All(list),
+        Optional('model'): All(list),
     }, extra=REMOVE_EXTRA)
 
 

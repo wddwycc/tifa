@@ -1,0 +1,8 @@
+from .base import db
+{% for captal, under_score in model %}
+from .{{ under_score }} import {{ captal }}
+{% endfor %}
+
+
+def init_app(app):
+    db.init_app(app)
