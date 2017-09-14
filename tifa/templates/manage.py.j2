@@ -12,6 +12,14 @@ def cli():
     pass
 
 
+{% if db %}
+@cli.command(help='Initialize database')
+def initdb():
+    from {{ name }}.model import db
+    db.create_all()
+{% endif %}
+
+
 @cli.command(help='Hello World')
 def hello():
     print('Hello world')

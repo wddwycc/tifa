@@ -1,8 +1,18 @@
 from flask import Flask
+{% if routes %}
 from . import routes
+{% endif %}
+{% if db %}
+from . import model
+{% endif %}
 
 
 def create_app():
     app = Flask(__name__)
+{% if routes %}
     routes.init_app(app)
+{% endif %}
+{% if db %}
+    model.init_app(app)
+{% endif %}
     return app

@@ -87,7 +87,7 @@ def gen(config):
             File(name='__init__.py', origin='db/__init__.py.j2'),
             File(name='base.py', origin='db/base.py.j2'),
         ]
-        module_folders.append(Folder(name='db', files=files))
+        module_folders.append(Folder(name='model', files=files))
         requirements += [
             'SQLAlchemy==1.1.14',
             'Flask-SQLAlchemy==2.2',
@@ -96,12 +96,17 @@ def gen(config):
     module_folder = Folder(
         name=name, sub_folders=module_folders,
         files=[
-            File(name='__init__.py', origin='__init__.py.j2')
+            File(name='__init__.py', origin='__init__.py.j2', params=dict(
+                routes=routes, db=db
+            ))
         ]
     )
 
+    # todo 添加conf files
     proj_files = [
-        File(name='manage.py', origin='manage.py.j2', params=dict(name=name)),
+        File(name='manage.py', origin='manage.py.j2', params=dict(
+            name=name, db=db
+        )),
     ]
 
     proj_folder = Template(
@@ -112,5 +117,7 @@ def gen(config):
     )
 
     proj_folder.render('./')
+    # todo: remove config file with confidence
+    # cli加一個flag, 默認移除yaml file，特殊指定則保留
 
     Prompt.success('project {} generated, enjoy coding'.format(name))
