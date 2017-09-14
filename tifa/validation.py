@@ -31,6 +31,6 @@ def validate_config(config_path):
             raise ValidationError('Cannot load configuration file')
     scheme = _config_scheme()
     try:
-        return scheme(config)
+        return scheme(config), config_path
     except MultipleInvalid:
         raise ValidationError('Configuration file invalid')

@@ -7,7 +7,7 @@ from jinja2 import Template as JTemplate
 from tifa.errors import ValidationError
 from tifa.core import Template
 from tifa.prompt import Prompt
-from tifa.validates import validate_config
+from tifa.validation import validate_config
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,7 +17,7 @@ def main():
     pass
 
 
-@main.command(help='Initialize tifa configuration yaml')
+@main.command(help='Generate a tifa configuration yaml')
 @click.option('--name', prompt='project name')
 def init(name):
     yaml_file = os.path.join(here, 'templates/tifa.example.yaml')
@@ -34,12 +34,14 @@ def init(name):
 
 @main.command(help='Generate project through configuration')
 @click.option(
-    '--config', type=click.Path(exists=True),
+    '--config', '-c', type=click.Path(exists=True),
     help='Specific configuration file path',
 )
-def gen(config):
+@click.option('--factory', '-f', is_flag=True)
+def gen(config, factory):
+    config_path = config
     try:
-        config = validate_config(config)
+        config, config_path = validate_config(config_path)
     except ValidationError as e:
         Prompt.warn(e.msg)
         return
@@ -51,7 +53,7 @@ def gen(config):
     template = Template(config)
     template.render('./')
 
-    # todo: remove config file with confidence
-    # cli加一個flag, 默認移除yaml file，特殊指定則保留
+    if not factory:
+        os.remove(config_path)
 
     Prompt.success('project {} generated, enjoy coding'.format(config['name']))
