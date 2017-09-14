@@ -51,6 +51,7 @@ setup(
         'PyYAML==3.12',
         'voluptuous==0.10.5',
     ],
+    tests_require=['pytest==3.2.2'],
     include_package_data=True,
     entry_points={
         'console_scripts': [
