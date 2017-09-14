@@ -11,6 +11,7 @@ from tifa.errors import ValidationError
 
 def _config_scheme():
     # todo: disable captical of name
+    # todo: check same table name & check no name called base
     return Schema({
         Required('name'): All(str, Length(min=1)),
         Optional('routes'): All(list),
@@ -30,7 +31,6 @@ def validate_config(config_path):
             raise ValidationError('Cannot load configuration file')
     scheme = _config_scheme()
     try:
-        config = scheme(config)
-        return config
+        return scheme(config)
     except MultipleInvalid:
         raise ValidationError('Configuration file invalid')

@@ -58,55 +58,62 @@ class Template(object):
         self.config = config
 
     @staticmethod
-    def default_requirements():
+    def _default_requirements():
         return ['click', 'Flask', 'Jinja2']
 
-    def render(self, path):
+    def _gen_routes(self):
+        routes = self.config.get('routes')
+        if not routes:
+            return None
+        files = [File(
+            name='{}.py'.format(route),
+            origin='routes/route.py.j2',
+            params=dict(name=route)
+        ) for route in routes]
+        files.append(
+            File(
+                name='__init__.py',
+                origin='routes/__init__.py.j2',
+                params=dict(routes=routes)
+            )
+        )
+        return Folder(name='routes', files=files)
+
+    def _gen_model(self):
+        model = self.config.get('model')
+        if not model:
+            return None
+        files = [File(
+            name='{}.py'.format(under_score(name)),
+            origin='model/table.py.j2',
+            params=dict(cls_name=name, table_name=under_score(name))
+        ) for name in model]
+        files += [
+            File(name='__init__.py', origin='model/__init__.py.j2',
+                 params=dict(model=[(x, under_score(x)) for x in model])),
+            File(name='base.py', origin='model/base.py.j2'),
+        ]
+        return Folder(name='model', files=files)
+
+    def _gen_py_module(self):
+        requirements = Template._default_requirements()
+
+        module_folders = list()
+
+        model_folder = self._gen_model()
+        if model_folder:
+            requirements += ['SQLAlchemy', 'Flask-SQLAlchemy']
+            module_folders.append(model_folder)
+
+        routes_folder = self._gen_routes()
+        if routes_folder:
+            module_folders.append(routes_folder)
+
         config = self.config
         name = config['name']
         routes = config.get('routes')
         model = config.get('model')
-
-        proj_dir = './{}'.format(name)
-        if os.path.isdir(proj_dir):
-            Prompt.warn('ops, project folder name has been used')
-            return
-
-        requirements = Template.default_requirements()
-
-        module_folders = list()
-        if routes:
-            files = [File(
-                name='{}.py'.format(route),
-                origin='routes/route.py.j2',
-                params=dict(name=route)
-            ) for route in routes]
-            files.append(
-                File(
-                    name='__init__.py',
-                    origin='routes/__init__.py.j2',
-                    params=dict(routes=routes)
-                )
-            )
-            module_folders.append(Folder(name='routes', files=files))
-        if model:
-            # todo: check same table name & check no name called base
-            files = [File(
-                name='{}.py'.format(under_score(name)),
-                origin='model/table.py.j2',
-                params=dict(cls_name=name, table_name=under_score(name))
-            ) for name in model]
-            files += [
-                File(name='__init__.py', origin='model/__init__.py.j2',
-                     params=dict(model=[(x, under_score(x)) for x in model])),
-                File(name='base.py', origin='model/base.py.j2'),
-            ]
-            module_folders.append(Folder(name='model', files=files))
-            requirements += [
-                'SQLAlchemy',
-                'Flask-SQLAlchemy',
-            ]
-        module_folder = Folder(
+        return Folder(
             name=name, sub_folders=module_folders,
             files=[
                 File(
@@ -114,23 +121,7 @@ class Template(object):
                     params=dict(routes=routes, model=model),
                 )
             ]
-        )
-
-        # todo 添加conf files
-        proj_files = [
-            File(name='manage.py', origin='manage.py.j2', params=dict(
-                name=name, model=model
-            )),
-        ]
-
-        proj_folder = Folder(
-            name=name,
-            sub_folders=[module_folder],
-            files=proj_files
-        )
-
-        proj_folder.render(path)
-        self.gen_requirements(requirements, path)
+        ), requirements
 
     def gen_requirements(self, requirements, path):
         requirements = [x + '==' + _PY_LIB_VERS[x] for x in requirements]
@@ -140,3 +131,21 @@ class Template(object):
         )
         with open(requirements_path, 'w') as f:
             f.write(requirements + '\n')
+
+    def render(self, path):
+        config = self.config
+        name = config['name']
+        model = config.get('model')
+        module_folder, requirements = self._gen_py_module()
+        manage_file = File(
+            name='manage.py', origin='manage.py.j2',
+            params=dict(name=name, model=model)
+        )
+        proj_files = [manage_file]
+        root_folder = Folder(
+            name=name,
+            sub_folders=[module_folder],
+            files=proj_files
+        )
+        root_folder.render(path)
+        self.gen_requirements(requirements, path)

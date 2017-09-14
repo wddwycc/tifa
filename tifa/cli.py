@@ -44,6 +44,10 @@ def gen(config):
         Prompt.warn(e.msg)
         return
 
+    if os.path.isdir(config['name']):
+        Prompt.warn('ops, project folder name has been used')
+        return
+
     template = Template(config)
     template.render('./')
 

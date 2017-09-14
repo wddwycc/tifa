@@ -17,9 +17,9 @@ def cli():
 def initdb():
     from {{ name }}.model import db
     db.create_all()
+
+
 {% endif %}
-
-
 @cli.command(help='Hello World')
 def hello():
     print('Hello world')
