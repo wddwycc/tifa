@@ -1,6 +1,2 @@
 class ValidationError(Exception):
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return repr(self.msg)
+    """Raise for tifa configuration file invalid"""

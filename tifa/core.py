@@ -3,7 +3,6 @@ import os
 from jinja2 import Template as JTemplate
 
 from tifa.filters import under_score
-from tifa.prompt import Prompt
 
 here = os.path.abspath(os.path.dirname(__file__))
 _template_root = os.path.join(here, 'templates')
@@ -23,6 +22,19 @@ class File(object):
         self.origin = origin
         self.params = params
 
+    def render(self, path):
+        template_path = os.path.join(_template_root, self.origin)
+        with open(template_path, 'r') as f:
+            template = JTemplate(f.read(), trim_blocks=True)
+        if self.params:
+            content = template.render(**self.params)
+        else:
+            content = template.render()
+        content += '\n'
+        file_path = os.path.join(path, self.name)
+        with open(file_path, 'w') as f:
+            f.write(content)
+
 
 class Folder(object):
     def __init__(self, name, sub_folders=None, files=None):
@@ -38,19 +50,10 @@ class Folder(object):
             for sub_folder in sub_folders:
                 sub_folder.render(cursor)
         files = self.files
-        if files:
-            for file in files:
-                template_path = os.path.join(_template_root, file.origin)
-                with open(template_path, 'r') as f:
-                    template = JTemplate(f.read(), trim_blocks=True)
-                if file.params:
-                    content = template.render(**file.params)
-                else:
-                    content = template.render()
-                content += '\n'
-                file_path = os.path.join(cursor, file.name)
-                with open(file_path, 'w') as f:
-                    f.write(content)
+        if not files:
+            return
+        for file in files:
+            file.render()
 
 
 class Template(object):
@@ -79,18 +82,18 @@ class Template(object):
         )
         return Folder(name='routes', files=files)
 
-    def _gen_model(self):
-        model = self.config.get('model')
-        if not model:
+    def _gen_models(self):
+        models = self.config.get('models')
+        if not models:
             return None
         files = [File(
-            name='{}.py'.format(under_score(name)),
+            name='{}.py'.format(under_score(model)),
             origin='model/table.py.j2',
-            params=dict(cls_name=name, table_name=under_score(name))
-        ) for name in model]
+            params=dict(cls_name=model, table_name=under_score(model))
+        ) for model in models]
         files += [
             File(name='__init__.py', origin='model/__init__.py.j2',
-                 params=dict(model=[(x, under_score(x)) for x in model])),
+                 params=dict(models=[(x, under_score(x)) for x in models])),
             File(name='base.py', origin='model/base.py.j2'),
         ]
         return Folder(name='model', files=files)
@@ -100,7 +103,7 @@ class Template(object):
 
         module_folders = list()
 
-        model_folder = self._gen_model()
+        model_folder = self._gen_models()
         if model_folder:
             requirements += ['SQLAlchemy', 'Flask-SQLAlchemy']
             module_folders.append(model_folder)
@@ -112,13 +115,13 @@ class Template(object):
         config = self.config
         name = config['name']
         routes = config.get('routes')
-        model = config.get('model')
+        models = config.get('models')
         return Folder(
             name=name, sub_folders=module_folders,
             files=[
                 File(
                     name='__init__.py', origin='__init__.py.j2',
-                    params=dict(routes=routes, model=model),
+                    params=dict(routes=routes, models=models),
                 )
             ]
         ), requirements
@@ -135,11 +138,11 @@ class Template(object):
     def render(self, path):
         config = self.config
         name = config['name']
-        model = config.get('model')
+        models = config.get('models')
         module_folder, requirements = self._gen_py_module()
         manage_file = File(
             name='manage.py', origin='manage.py.j2',
-            params=dict(name=name, model=model)
+            params=dict(name=name, models=models)
         )
         proj_files = [manage_file]
         root_folder = Folder(

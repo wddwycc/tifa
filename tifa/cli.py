@@ -39,9 +39,9 @@ def init(name):
 )
 @click.option('--factory', '-f', is_flag=True)
 def gen(config, factory):
-    config_path = config
+    config_path = config or './tifa.yaml'
     try:
-        config, config_path = validate_config(config_path)
+        config = validate_config(config_path)
     except ValidationError as e:
         Prompt.warn(e.msg)
         return

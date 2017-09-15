@@ -2,6 +2,6 @@ name: {{ name }}
 routes:
   - front
   - api
-model:
+models:
   - User
   - Product

@@ -12,7 +12,7 @@ def cli():
     pass
 
 
-{% if model %}
+{% if models %}
 @cli.command(help='Initialize database')
 def initdb():
     from {{ name }}.model import db
