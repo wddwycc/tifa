@@ -14,13 +14,18 @@ A modern flask scaffolding ( under development )
 Flask and Webpack are both brilliant tool for developers to quickly setup and develop web applications. The combination of them two could meet most modern web development requirements today.
 
 If you want to build a traditional web server:
+
 **Web server ( Flask ) + Webpack ( pack assets )**
 
 If you want to separate front-end and back-end:
+
 **API Server ( Flask ) + Front-end ( A SPA framework with webpack to pack assets )**
 
-Or more cutting-edge solution which I prefer recently, use traditional web server and Vue.js to improve user interaction by injecting web components.
+Or more cutting-edge solution which I prefer recently, use traditional web server and Vue.js to improve user interaction by injecting web components:
+
 **Web server ( Flask ) + Front-end improvements ( Vue.js )  + Webpack ( pack assets )**
+
+
 
 tifa is a scaffolding designed to create these environments for you.
 

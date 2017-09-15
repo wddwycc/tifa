@@ -1,13 +1,11 @@
 import os
-import shutil
 
 import click
-from jinja2 import Template as JTemplate
 
+from tifa.core import Template, File
 from tifa.errors import ValidationError
-from tifa.core import Template
 from tifa.prompt import Prompt
-from tifa.validation import validate_config
+from tifa.validation import normalize_config
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,15 +18,11 @@ def main():
 @main.command(help='Generate a tifa configuration yaml')
 @click.option('--name', prompt='project name')
 def init(name):
-    yaml_file = os.path.join(here, 'templates/tifa.example.yaml')
-    target_file = './tifa.yaml'
-    shutil.copyfile(yaml_file, target_file)
-    with open(target_file, 'r+') as f:
-        template = JTemplate(f.read())
-        content = template.render(name=name) + '\n'
-        f.seek(0)
-        f.truncate()
-        f.write(content)
+    file = File(
+        name='tifa.yaml', origin='tifa.example.yaml',
+        params=dict(name=name)
+    )
+    file.render('./')
     Prompt.success('Created tifa.yaml')
 
 
@@ -41,7 +35,7 @@ def init(name):
 def gen(config, factory):
     config_path = config or './tifa.yaml'
     try:
-        config = validate_config(config_path)
+        config = normalize_config(config_path)
     except ValidationError as e:
         Prompt.warn(str(e))
         return

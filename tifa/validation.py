@@ -10,7 +10,6 @@ from tifa.errors import ValidationError
 
 
 def _config_schema():
-    # todo: check same table name & check no name called base
     return Schema({
         Required('name'): All(str, Length(min=1)),
         Optional('routes'): All(list),
@@ -18,7 +17,7 @@ def _config_schema():
     }, extra=REMOVE_EXTRA)
 
 
-def validate_config(config_path):
+def normalize_config(config_path):
     if not os.path.isfile(config_path):
         raise ValidationError('no configuration file found')
     with open(config_path, 'r') as f:
@@ -42,6 +41,7 @@ def validate_config(config_path):
             if ' ' in route or route == '':
                 raise ValidationError('invalid route: {}'.format(route))
         routes = [route.lower() for route in routes]
+        routes = list(set(routes))
         config['routes'] = routes
     # validate models
     models = config.get('models')
@@ -49,4 +49,6 @@ def validate_config(config_path):
         for model in models:
             if ' ' in model or not model[0].isupper() or model == 'Base':
                 raise ValidationError('invalid model: {}'.format(model))
+        models = list(set(models))
+        config['models'] = models
     return config

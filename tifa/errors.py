@@ -1,2 +1,2 @@
 class ValidationError(Exception):
-    """Raise for tifa configuration file invalid"""
+    """Raise when tifa configuration file invalid"""

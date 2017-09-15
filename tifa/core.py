@@ -61,10 +61,10 @@ class Template(object):
         self.config = config
 
     @staticmethod
-    def _default_requirements():
+    def default_requirements():
         return ['click', 'Flask', 'Jinja2']
 
-    def _gen_routes(self):
+    def gen_routes(self):
         routes = self.config.get('routes')
         if not routes:
             return None
@@ -82,7 +82,7 @@ class Template(object):
         )
         return Folder(name='routes', files=files)
 
-    def _gen_models(self):
+    def gen_models(self):
         models = self.config.get('models')
         if not models:
             return None
@@ -96,19 +96,20 @@ class Template(object):
                  params=dict(models=[(x, under_score(x)) for x in models])),
             File(name='base.py', origin='model/base.py.j2'),
         ]
+        # todo: support some default model templates, like user
         return Folder(name='model', files=files)
 
-    def _gen_py_module(self):
-        requirements = Template._default_requirements()
+    def gen_py_module(self):
+        requirements = Template.default_requirements()
 
         module_folders = list()
 
-        model_folder = self._gen_models()
+        model_folder = self.gen_models()
         if model_folder:
             requirements += ['SQLAlchemy', 'Flask-SQLAlchemy']
             module_folders.append(model_folder)
 
-        routes_folder = self._gen_routes()
+        routes_folder = self.gen_routes()
         if routes_folder:
             module_folders.append(routes_folder)
 
@@ -139,7 +140,7 @@ class Template(object):
         config = self.config
         name = config['name']
         models = config.get('models')
-        module_folder, requirements = self._gen_py_module()
+        module_folder, requirements = self.gen_py_module()
         manage_file = File(
             name='manage.py', origin='manage.py.j2',
             params=dict(name=name, models=models)

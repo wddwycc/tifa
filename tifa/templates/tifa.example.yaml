@@ -1,7 +1,9 @@
 name: {{ name }}
 routes:
+  # for front, empty url prefix would be given
   - front
   - api
+# Use camel case for Model, tablename would automatically be transformed to underscore
 models:
   - User
   - Product
