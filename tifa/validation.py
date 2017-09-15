@@ -14,6 +14,7 @@ def _config_schema():
         Required('name'): All(str, Length(min=1)),
         Optional('routes'): All(list),
         Optional('models'): All(list),
+        Optional('confs'): All(list),
     }, extra=REMOVE_EXTRA)
 
 

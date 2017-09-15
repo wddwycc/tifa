@@ -2,7 +2,7 @@ from flask import Flask
 {% if routes %}
 from . import routes
 {% endif %}
-{% if model %}
+{% if models %}
 from . import model
 {% endif %}
 
@@ -12,7 +12,7 @@ def create_app():
 {% if routes %}
     routes.init_app(app)
 {% endif %}
-{% if model %}
+{% if models %}
     model.init_app(app)
 {% endif %}
     return app

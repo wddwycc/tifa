@@ -1,9 +1,25 @@
 name: {{ name }}
+
+# for route `front`, empty url prefix would be given.
+# other routes would have its name as route prefix.
 routes:
-  # for front, empty url prefix would be given
   - front
   - api
-# Use camel case for Model, tablename would automatically be transformed to underscore
+
+# Use camel case for model name, tablename would automatically be transformed to underscore.
 models:
   - User
   - Product
+
+# if specified, would generate associated config files in `./conf` folder
+confs:
+  - supervisor
+  - gunicorn
+  - nginx
+
+# webpack modes
+# false: Web server ( Flask )
+# classic: Web server ( Flask ) + Webpack ( pack assets )
+# separate: API Server ( Flask ) + Front-end ( Vue.js with webpack to pack assets )
+# partial: Web server ( Flask ) + Front-end improvements ( Vue.js ) + Webpack ( pack assets )
+webpack: false

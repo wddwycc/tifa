@@ -127,6 +127,31 @@ class Template(object):
             ]
         ), requirements
 
+    def gen_confs(self):
+        confs = self.config.get('confs')
+        if not confs:
+            return None
+        files = []
+        domain = '<domain>'
+        port = '<port>'
+        if 'supervisor' in confs:
+            files.append(File(
+                name='supervisor.conf', origin='conf/supervisor.conf.j2',
+                params=dict(name=self.config['name'])
+            ))
+        if 'gunicorn' in confs:
+            files.append(File(
+                name='gunicorn_conf.py', origin='conf/gunicorn_conf.py.j2',
+                params=dict(port=port)
+            ))
+        if 'nginx' in confs:
+            files.append(File(
+                name='nginx.conf', origin='conf/nginx.conf.j2',
+                params=dict(domain=domain, port=port)
+            ))
+        return Folder(name='conf', files=files)
+
+    # todo: requirement as a specfic File
     def gen_requirements(self, requirements, path):
         requirements = [x + '==' + _PY_LIB_VERS[x] for x in requirements]
         requirements = '\n'.join(requirements)
@@ -141,15 +166,19 @@ class Template(object):
         name = config['name']
         models = config.get('models')
         module_folder, requirements = self.gen_py_module()
+        root_folders = [module_folder]
+        conf_folder = self.gen_confs()
+        if conf_folder:
+            root_folders.append(conf_folder)
         manage_file = File(
             name='manage.py', origin='manage.py.j2',
             params=dict(name=name, models=models)
         )
-        proj_files = [manage_file]
-        root_folder = Folder(
+        root_files = [manage_file]
+        root = Folder(
             name=name,
-            sub_folders=[module_folder],
-            files=proj_files
+            sub_folders=root_folders,
+            files=root_files
         )
-        root_folder.render(path)
+        root.render(path)
         self.gen_requirements(requirements, path)
