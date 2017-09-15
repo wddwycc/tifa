@@ -10,7 +10,6 @@ from tifa.errors import ValidationError
 
 
 def _config_schema():
-    # todo: disable captical of name
     # todo: check same table name & check no name called base
     return Schema({
         Required('name'): All(str, Length(min=1)),
@@ -48,6 +47,6 @@ def validate_config(config_path):
     models = config.get('models')
     if models:
         for model in models:
-            if ' ' in model or model == '':
+            if ' ' in model or not model[0].isupper() or model == 'Base':
                 raise ValidationError('invalid model: {}'.format(model))
     return config

@@ -53,7 +53,7 @@ class Folder(object):
         if not files:
             return
         for file in files:
-            file.render()
+            file.render(cursor)
 
 
 class Template(object):

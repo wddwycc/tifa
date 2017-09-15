@@ -43,7 +43,7 @@ def gen(config, factory):
     try:
         config = validate_config(config_path)
     except ValidationError as e:
-        Prompt.warn(e.msg)
+        Prompt.warn(str(e))
         return
 
     if os.path.isdir(config['name']):
