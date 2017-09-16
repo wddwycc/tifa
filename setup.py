@@ -64,7 +64,7 @@ setup(
     author_email='wddwyss@gmail.com',
     description='a modern flask scaffolding',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'License :: OSI Approved :: MIT License',
