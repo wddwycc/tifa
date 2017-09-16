@@ -282,7 +282,11 @@ class Template(object):
             name='manage.py', origin='manage.py.j2',
             params=dict(name=name, models=models)
         )
-        root_files = [manage_file, self.gen_py_lib_file(requirements)]
+        root_files = [
+            manage_file, self.gen_py_lib_file(requirements),
+            File(name='README.md', origin='readme.md.j2',
+                 params=dict(name=self.name)),
+        ]
         js_lib_file = self.gen_js_lib_file()
         if js_lib_file:
             root_files.append(js_lib_file)
