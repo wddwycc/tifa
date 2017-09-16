@@ -15,4 +15,24 @@ def create_app():
 {% if models %}
     model.init_app(app)
 {% endif %}
+
+    import os
+
+    dev_config = os.path.join(app.root_path, '../conf/dev_settings.py')
+    app.config.from_pyfile(dev_config)
+{% if has_assets %}
+
+    import json
+
+    assets_file = app.config['ASSETS_FILE']
+    with open(assets_file, 'rb') as f:
+        assets = json.load(f)
+
+    @app.context_processor
+    def register_context_processor():
+        return dict(
+            assets=assets,
+        )
+
+{% endif %}
     return app

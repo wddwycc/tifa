@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>tifa</title>
+  {% for src in assets.styles %}
+    <link rel="stylesheet" href='{{ src }}' type='text/css' media='all'>
+  {% endfor %}
+</head>
+
+<body>
+
+{% for src in assets.scripts %}
+  <script src="{{ src }}"></script>
+{% endfor %}
+</body>
+</html>

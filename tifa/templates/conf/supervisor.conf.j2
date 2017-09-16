@@ -6,7 +6,7 @@ autostart=true
 autorestart=true
 stopsignal=TERM
 
-stdout_logfile=/var/log/supervisor/akame.log
+stdout_logfile=/var/log/supervisor/{{ name }}.log
 stdout_logfile_maxbytes=50MB
 stdout_logfile_backups=5
 redirect_stderr=true

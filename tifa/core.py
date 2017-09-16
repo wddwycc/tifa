@@ -1,13 +1,14 @@
 import os
+from shutil import copyfile
 
 from jinja2 import Template as JTemplate
 
-from tifa.filters import under_score
 from tifa.consts import PY_LIB_VERS, JS_LIB_VERS
 from tifa.consts import (
     WEBPACK_MODE_DISABLE, WEBPACK_MODE_CLASSIC,
     WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL
 )
+from tifa.filters import under_score
 
 here = os.path.abspath(os.path.dirname(__file__))
 _template_root = os.path.join(here, 'templates')
@@ -20,17 +21,17 @@ class File(object):
         self.params = params
 
     def render(self, path):
-        template_path = os.path.join(_template_root, self.origin)
-        with open(template_path, 'r') as f:
-            template = JTemplate(f.read(), trim_blocks=True)
-        if self.params:
-            content = template.render(**self.params)
-        else:
-            content = template.render()
-        content += '\n'
         file_path = os.path.join(path, self.name)
-        with open(file_path, 'w') as f:
-            f.write(content)
+        template_path = os.path.join(_template_root, self.origin)
+        if self.params:
+            with open(template_path, 'r') as f:
+                template = JTemplate(f.read(), trim_blocks=True)
+            content = template.render(**self.params)
+            content += '\n'
+            with open(file_path, 'w') as f:
+                f.write(content)
+        else:
+            copyfile(template_path, file_path)
 
 
 class Folder(object):
@@ -81,6 +82,12 @@ class Template(object):
     def webpack_mode(self):
         return self.config.get('webpack')
 
+    @property
+    def has_assets(self):
+        return self.webpack_mode in [
+            WEBPACK_MODE_CLASSIC, WEBPACK_MODE_RADICAL
+        ]
+
     def gen_routes(self):
         routes = self.routes
         if not routes:
@@ -116,6 +123,13 @@ class Template(object):
         # todo: support some default model templates, like user
         return Folder(name='model', files=files)
 
+    def gen_flask_template_folder(self):
+        if not self.has_assets:
+            return None
+        return Folder(name='templates', files=[
+            File(name='base.html', origin='html/base.html.j2')
+        ])
+
     def gen_py_module(self):
         requirements = Template.default_requirements()
 
@@ -130,6 +144,10 @@ class Template(object):
         if routes_folder:
             module_folders.append(routes_folder)
 
+        flask_template_folder = self.gen_flask_template_folder()
+        if flask_template_folder:
+            module_folders.append(flask_template_folder)
+
         config = self.config
         name = config['name']
         routes = config.get('routes')
@@ -139,7 +157,10 @@ class Template(object):
             files=[
                 File(
                     name='__init__.py', origin='__init__.py.j2',
-                    params=dict(routes=routes, models=models),
+                    params=dict(
+                        routes=routes, models=models,
+                        has_assets=self.has_assets
+                    ),
                 )
             ]
         ), requirements
@@ -148,7 +169,11 @@ class Template(object):
         confs = self.confs
         if not confs:
             return None
-        files = []
+        files = [
+            File(name='dev_settings.py',
+                 origin='conf/dev_settings.py.j2',
+                 params=dict(has_assets=self.has_assets))
+        ]
         domain = '<domain>'
         port = '<port>'
         if 'supervisor' in confs:
