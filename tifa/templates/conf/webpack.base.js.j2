@@ -1,5 +1,8 @@
 const path = require('path')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+{% if mode == 'separate' %}
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+{% endif %}
 
 module.exports = {
   entry: {
@@ -34,5 +37,8 @@ module.exports = {
     new ExtractTextPlugin({
       filename: '[name].css', disable: false, allChunks: true
     }),
+{% if mode == 'separate' %}
+    new HtmlWebpackPlugin(),
+{% endif %}
   ],
 }

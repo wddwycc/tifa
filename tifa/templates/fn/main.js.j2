@@ -1,1 +1,39 @@
 require('./css/normalize.css')
+
+{% if webpack_mode in ['separate', 'radical'] %}
+import Vue from 'vue'
+import App from './App.vue'
+
+const rootEl = document.getElementById('app');
+if (rootEl) {
+  const RootApp = Vue.extend(App);
+  const app = new RootApp({});
+  app.$mount(rootEl);
+}
+
+{% if webpack_mode == 'radical' %}
+function mountComponent(el) {
+  const name = el.getAttribute('data-component');
+  let data = {};
+  let text = el.getAttribute('data-data');
+  if (text) {
+    data = JSON.parse(text);
+  }
+  let propsData = {};
+  text = el.getAttribute('data-props');
+  if (text) {
+    propsData = JSON.parse(text);
+  }
+  const Comp = Vue.component(name);
+  const app = new Comp({data, propsData});
+  app.$mount(el);
+}
+
+if (document.querySelectorAll) {
+  const els = document.querySelectorAll('[data-component]');
+  for (let i = 0; i < els.length; i++) {
+    mountComponent(els[i]);
+  }
+}
+{% endif %}
+{% endif %}

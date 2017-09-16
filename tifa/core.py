@@ -169,9 +169,13 @@ class Template(object):
         webpack_mode = self.webpack_mode
         if webpack_mode == WEBPACK_MODE_DISABLE:
             return Folder(name='conf', files=files)
-        base = File(name='webpack.base.js', origin='conf/webpack.base.js.j2')
-        dev = File(name='webpack.dev.js', origin='conf/webpack.dev.js.j2')
-        prod = File(name='webpack.prod.js', origin='conf/webpack.prod.js.j2')
+        params = dict(mode=webpack_mode)
+        base = File(name='webpack.base.js', origin='conf/webpack.base.js.j2',
+                    params=params)
+        dev = File(name='webpack.dev.js', origin='conf/webpack.dev.js.j2',
+                   params=params)
+        prod = File(name='webpack.prod.js', origin='conf/webpack.prod.js.j2',
+                    params=params)
         assets = File(name='assets.json', origin='conf/assets.json.j2')
         if webpack_mode == WEBPACK_MODE_CLASSIC:
             pass
@@ -218,9 +222,13 @@ class Template(object):
         css_folder = Folder(name='css', files=[
             File(name='normalize.css', origin='fn/normalize.css.j2')
         ])
-        return Folder(name='fn', sub_folders=[css_folder], files=[
-            File(name='main.js', origin='fn/main.js.j2')
-        ])
+        root_files = [
+            File(name='main.js', origin='fn/main.js.j2',
+                 params=dict(webpack_mode=self.webpack_mode))
+        ]
+        if self.webpack_mode in [WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL]:
+            root_files.append(File(name='App.vue', origin='fn/App.vue.j2'))
+        return Folder(name='fn', sub_folders=[css_folder], files=root_files)
 
     @staticmethod
     def gen_py_lib_file(libs):
