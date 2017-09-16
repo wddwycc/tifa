@@ -3,17 +3,14 @@ import os
 from jinja2 import Template as JTemplate
 
 from tifa.filters import under_score
+from tifa.consts import PY_LIB_VERS, JS_LIB_VERS
+from tifa.consts import (
+    WEBPACK_MODE_DISABLE, WEBPACK_MODE_CLASSIC,
+    WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL
+)
 
 here = os.path.abspath(os.path.dirname(__file__))
 _template_root = os.path.join(here, 'templates')
-
-_PY_LIB_VERS = {
-    'click': '6.7',
-    'Flask': '0.12.2',
-    'Jinja2': '2.9.6',
-    'SQLAlchemy': '1.1.14',
-    'Flask-SQLAlchemy': '2.2',
-}
 
 
 class File(object):
@@ -64,8 +61,28 @@ class Template(object):
     def default_requirements():
         return ['click', 'Flask', 'Jinja2']
 
+    @property
+    def name(self):
+        return self.config['name']
+
+    @property
+    def routes(self):
+        return self.config.get('routes')
+
+    @property
+    def models(self):
+        return self.config.get('models')
+
+    @property
+    def confs(self):
+        return self.config.get('confs')
+
+    @property
+    def webpack_mode(self):
+        return self.config.get('webpack')
+
     def gen_routes(self):
-        routes = self.config.get('routes')
+        routes = self.routes
         if not routes:
             return None
         files = [File(
@@ -83,7 +100,7 @@ class Template(object):
         return Folder(name='routes', files=files)
 
     def gen_models(self):
-        models = self.config.get('models')
+        models = self.models
         if not models:
             return None
         files = [File(
@@ -128,7 +145,7 @@ class Template(object):
         ), requirements
 
     def gen_confs(self):
-        confs = self.config.get('confs')
+        confs = self.confs
         if not confs:
             return None
         files = []
@@ -149,17 +166,56 @@ class Template(object):
                 name='nginx.conf', origin='conf/nginx.conf.j2',
                 params=dict(domain=domain, port=port)
             ))
+        webpack_mode = self.webpack_mode
+        # todo: generate webpack files
+        if webpack_mode == WEBPACK_MODE_CLASSIC:
+            pass
+        elif webpack_mode == WEBPACK_MODE_SEPARATE:
+            pass
+        elif webpack_mode == WEBPACK_MODE_RADICAL:
+            pass
         return Folder(name='conf', files=files)
 
-    # todo: requirement as a specfic File
-    def gen_requirements(self, requirements, path):
-        requirements = [x + '==' + _PY_LIB_VERS[x] for x in requirements]
-        requirements = '\n'.join(requirements)
-        requirements_path = os.path.join(
-            path, self.config['name'], 'requirements.txt'
+    @staticmethod
+    def gen_py_lib_file(libs):
+        libs = [x + '==' + PY_LIB_VERS[x] for x in libs]
+        return File(
+            name='requirements.txt',
+            origin='requirements.txt.j2',
+            params=dict(libs=libs)
         )
-        with open(requirements_path, 'w') as f:
-            f.write(requirements + '\n')
+
+    def gen_js_lib_file(self):
+        webpack_mode = self.webpack_mode
+        if webpack_mode == WEBPACK_MODE_DISABLE:
+            return None
+        libs = []
+        dev_libs = []
+        if webpack_mode == WEBPACK_MODE_CLASSIC:
+            dev_libs = ['webpack', 'webpack-dev-server']
+        if webpack_mode == WEBPACK_MODE_SEPARATE:
+            libs = ['vue']
+            dev_libs = [
+                'webpack', 'webpack-dev-server',
+                'html-webpack-plugin'
+            ]
+        if webpack_mode == WEBPACK_MODE_RADICAL:
+            libs = ['vue']
+            dev_libs = ['webpack', 'webpack-dev-server']
+
+        def lib_row(lib):
+            return '"' + lib + '": ' + '"' + JS_LIB_VERS[lib] + '"'
+
+        libs = [lib_row(x) for x in libs]
+        dev_libs = [lib_row(x) for x in dev_libs]
+        return File(
+            name='package.json',
+            origin='package.json.j2',
+            params=dict(libs=libs, dev_libs=dev_libs, name=self.config['name'])
+        )
+
+    def gen_src_folder(self):
+        pass
 
     def render(self, path):
         config = self.config
@@ -174,11 +230,13 @@ class Template(object):
             name='manage.py', origin='manage.py.j2',
             params=dict(name=name, models=models)
         )
-        root_files = [manage_file]
+        root_files = [manage_file, self.gen_py_lib_file(requirements)]
+        js_lib_file = self.gen_js_lib_file()
+        if js_lib_file:
+            root_files.append(js_lib_file)
         root = Folder(
             name=name,
             sub_folders=root_folders,
             files=root_files
         )
         root.render(path)
-        self.gen_requirements(requirements, path)

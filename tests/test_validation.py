@@ -13,12 +13,14 @@ def mock_valid_config():
         models:
           - User
           - Product
+        webpack: false
     '''
 
 
 def mock_bad_name_config():
     return '''
         name: ti fa
+        webpack: false
     '''
 
 
@@ -27,6 +29,7 @@ def mock_bad_routes_config():
         name: tifa
         routes:
           - fr ont
+        webpack: false
     '''
 
 
@@ -35,6 +38,7 @@ def mock_bad_models_config():
         name: tifa
         models:
           - Us er
+        webpack: false
     '''
 
 

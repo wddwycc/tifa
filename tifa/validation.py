@@ -1,11 +1,15 @@
 import os
 
 import yaml
-from voluptuous import All
+from voluptuous import All, Any
 from voluptuous import REMOVE_EXTRA
 from voluptuous import Required, Optional, Length
 from voluptuous import Schema, MultipleInvalid
 
+from tifa.consts import (
+    WEBPACK_MODE_DISABLE, WEBPACK_MODE_CLASSIC,
+    WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL
+)
 from tifa.errors import ValidationError
 
 
@@ -15,6 +19,10 @@ def _config_schema():
         Optional('routes'): All(list),
         Optional('models'): All(list),
         Optional('confs'): All(list),
+        Required('webpack'): Any(
+            WEBPACK_MODE_DISABLE, WEBPACK_MODE_CLASSIC,
+            WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL,
+        ),
     }, extra=REMOVE_EXTRA)
 
 

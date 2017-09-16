@@ -1,0 +1,17 @@
+{
+  "name": "{{ name }}",
+  "scripts": {
+    "dev": "webpack-dev-server --config conf/webpack.dev.js --hot --inline",
+    "prod": "rm -rf dist && NODE_ENV=production webpack --config conf/webpack.prod.js"
+  },
+  "dependencies": {
+{% for lib in libs %}
+    {{ lib }}{{ "," if not loop.last }}
+{% endfor %}
+  },
+  "devDependencies": {
+{% for lib in dev_libs %}
+    {{ lib }}{{ "," if not loop.last }}
+{% endfor %}
+  }
+}
