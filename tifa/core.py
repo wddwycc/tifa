@@ -172,13 +172,14 @@ class Template(object):
         base = File(name='webpack.base.js', origin='conf/webpack.base.js.j2')
         dev = File(name='webpack.dev.js', origin='conf/webpack.dev.js.j2')
         prod = File(name='webpack.prod.js', origin='conf/webpack.prod.js.j2')
+        assets = File(name='assets.json', origin='conf/assets.json.j2')
         if webpack_mode == WEBPACK_MODE_CLASSIC:
             pass
         elif webpack_mode == WEBPACK_MODE_SEPARATE:
             pass
         elif webpack_mode == WEBPACK_MODE_RADICAL:
             pass
-        files += [base, dev, prod]
+        files += [base, dev, prod, assets]
         return Folder(name='conf', files=files)
 
     def gen_js_lib_file(self):
