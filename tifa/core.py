@@ -167,55 +167,69 @@ class Template(object):
                 params=dict(domain=domain, port=port)
             ))
         webpack_mode = self.webpack_mode
-        # todo: generate webpack files
+        if webpack_mode == WEBPACK_MODE_DISABLE:
+            return Folder(name='conf', files=files)
+        base = File(name='webpack.base.js', origin='conf/webpack.base.js.j2')
+        dev = File(name='webpack.dev.js', origin='conf/webpack.dev.js.j2')
+        prod = File(name='webpack.prod.js', origin='conf/webpack.prod.js.j2')
         if webpack_mode == WEBPACK_MODE_CLASSIC:
             pass
         elif webpack_mode == WEBPACK_MODE_SEPARATE:
             pass
         elif webpack_mode == WEBPACK_MODE_RADICAL:
             pass
+        files += [base, dev, prod]
         return Folder(name='conf', files=files)
 
-    @staticmethod
-    def gen_py_lib_file(libs):
-        libs = [x + '==' + PY_LIB_VERS[x] for x in libs]
-        return File(
-            name='requirements.txt',
-            origin='requirements.txt.j2',
-            params=dict(libs=libs)
-        )
-
     def gen_js_lib_file(self):
+        """Generate package.json"""
         webpack_mode = self.webpack_mode
         if webpack_mode == WEBPACK_MODE_DISABLE:
             return None
         libs = []
-        dev_libs = []
+        dev_libs = [
+            'webpack', 'webpack-dev-server',
+            'babel-core', 'babel-loader', 'babel-preset-env',
+            'extract-text-webpack-plugin', 'css-loader', 'style-loader',
+        ]
         if webpack_mode == WEBPACK_MODE_CLASSIC:
-            dev_libs = ['webpack', 'webpack-dev-server']
+            pass
         if webpack_mode == WEBPACK_MODE_SEPARATE:
-            libs = ['vue']
-            dev_libs = [
-                'webpack', 'webpack-dev-server',
-                'html-webpack-plugin'
-            ]
+            libs += ['vue']
         if webpack_mode == WEBPACK_MODE_RADICAL:
             libs = ['vue']
-            dev_libs = ['webpack', 'webpack-dev-server']
 
-        def lib_row(lib):
+        def _lib_row(lib):
             return '"' + lib + '": ' + '"' + JS_LIB_VERS[lib] + '"'
 
-        libs = [lib_row(x) for x in libs]
-        dev_libs = [lib_row(x) for x in dev_libs]
+        libs = [_lib_row(x) for x in libs]
+        dev_libs = [_lib_row(x) for x in dev_libs]
         return File(
             name='package.json',
             origin='package.json.j2',
             params=dict(libs=libs, dev_libs=dev_libs, name=self.config['name'])
         )
 
-    def gen_src_folder(self):
-        pass
+    def gen_fn_folder(self):
+        """Generate front-end folder"""
+        if self.webpack_mode == WEBPACK_MODE_DISABLE:
+            return None
+        css_folder = Folder(name='css', files=[
+            File(name='normalize.css', origin='fn/normalize.css.j2')
+        ])
+        return Folder(name='fn', sub_folders=[css_folder], files=[
+            File(name='main.js', origin='fn/main.js.j2')
+        ])
+
+    @staticmethod
+    def gen_py_lib_file(libs):
+        """Generate python requirements.txt"""
+        libs = [x + '==' + PY_LIB_VERS[x] for x in libs]
+        return File(
+            name='requirements.txt',
+            origin='requirements.txt.j2',
+            params=dict(libs=libs)
+        )
 
     def render(self, path):
         config = self.config
@@ -226,6 +240,10 @@ class Template(object):
         conf_folder = self.gen_confs()
         if conf_folder:
             root_folders.append(conf_folder)
+        fn_folder = self.gen_fn_folder()
+        if fn_folder:
+            root_folders.append(fn_folder)
+
         manage_file = File(
             name='manage.py', origin='manage.py.j2',
             params=dict(name=name, models=models)
