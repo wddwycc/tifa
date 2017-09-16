@@ -5,7 +5,7 @@ tifa
 [![license](https://img.shields.io/pypi/pyversions/tifa.svg)](https://pypi.python.org/pypi/tifa)
 [![license](https://img.shields.io/pypi/l/tifa.svg)](https://pypi.python.org/pypi/tifa)
 
-A modern flask scaffolding ( under development )
+A modern flask scaffolding
 
 ![](https://storage.googleapis.com/duan/etc/A45A991C-54C7-4B6A-8906-9265CE7893E8/tifa.jpg)
 
@@ -63,3 +63,30 @@ If you want to keep it, add a `--factory` flag
 ```
 $ tifa gen --factory
 ```
+
+## Configuration Specs
+
+```yaml
+name: <project name>
+# for route `front`, empty url prefix would be given.
+# other routes would have its name as route prefix.
+routes:
+  - front
+  - api
+# Use camel case for model name, tablename would automatically be transformed to underscore.
+models:
+  - User
+  - Product
+# if specified, would generate associated config files in `./conf` folder
+confs:
+  - supervisor
+  - gunicorn
+  - nginx
+# webpack modes
+# false: Web server ( Flask ) without webpack
+# classic: Web server ( Flask ) + Webpack ( pack assets )
+# separate: API Server ( Flask ) + Front-end ( Vue.js with webpack to pack assets )
+# radical: Web server ( Flask ) + Front-end improvements ( Vue.js ) + Webpack ( pack assets )
+webpack: classic
+```
+
