@@ -224,6 +224,7 @@ class Template(object):
             pass
         if webpack_mode == WEBPACK_MODE_SEPARATE:
             libs += ['vue']
+            dev_libs += ['html-webpack-plugin']
         if webpack_mode == WEBPACK_MODE_RADICAL:
             libs = ['vue']
 
