@@ -167,8 +167,6 @@ class Template(object):
 
     def gen_confs(self):
         confs = self.confs
-        if not confs:
-            return None
         files = [
             File(name='dev_settings.py',
                  origin='conf/dev_settings.py.j2',
@@ -195,20 +193,19 @@ class Template(object):
         if webpack_mode == WEBPACK_MODE_DISABLE:
             return Folder(name='conf', files=files)
         params = dict(mode=webpack_mode)
-        base = File(name='webpack.base.js', origin='conf/webpack.base.js.j2',
-                    params=params)
-        dev = File(name='webpack.dev.js', origin='conf/webpack.dev.js.j2',
-                   params=params)
-        prod = File(name='webpack.prod.js', origin='conf/webpack.prod.js.j2',
-                    params=params)
-        assets = File(name='assets.json', origin='conf/assets.json.j2')
-        if webpack_mode == WEBPACK_MODE_CLASSIC:
-            pass
-        elif webpack_mode == WEBPACK_MODE_SEPARATE:
-            pass
-        elif webpack_mode == WEBPACK_MODE_RADICAL:
-            pass
-        files += [base, dev, prod, assets]
+        webpack_base = File(
+            name='webpack.base.js',
+            origin='conf/webpack.base.js.j2', params=params)
+        webpack_dev = File(
+            name='webpack.dev.js',
+            origin='conf/webpack.dev.js.j2', params=params)
+        webpack_prod = File(
+            name='webpack.prod.js',
+            origin='conf/webpack.prod.js.j2', params=params)
+        files += [webpack_base, webpack_dev, webpack_prod]
+        if self.has_assets:
+            assets = File(name='assets.json', origin='conf/assets.json.j2')
+            files.append(assets)
         return Folder(name='conf', files=files)
 
     def gen_js_lib_file(self):
