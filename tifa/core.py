@@ -292,6 +292,8 @@ class Template(object):
         js_lib_file = self.gen_js_lib_file()
         if js_lib_file:
             root_files.append(js_lib_file)
+        if self.webpack_mode:
+            root_files.append(File(name='.babelrc', origin='conf/.babelrc.j2'))
         root = Folder(
             name=name,
             sub_folders=root_folders,
