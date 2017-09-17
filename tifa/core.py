@@ -88,6 +88,12 @@ class Template(object):
             WEBPACK_MODE_CLASSIC, WEBPACK_MODE_RADICAL
         ]
 
+    @property
+    def has_vue(self):
+        return self.webpack_mode in [
+            WEBPACK_MODE_SEPARATE, WEBPACK_MODE_RADICAL
+        ]
+
     def gen_routes(self):
         routes = self.routes
         if not routes:
@@ -193,7 +199,7 @@ class Template(object):
         webpack_mode = self.webpack_mode
         if webpack_mode == WEBPACK_MODE_DISABLE:
             return Folder(name='conf', files=files)
-        params = dict(mode=webpack_mode)
+        params = dict(mode=webpack_mode, has_vue=self.has_vue)
         webpack_base = File(
             name='webpack.base.js',
             origin='conf/webpack.base.js.j2', params=params)
@@ -220,13 +226,11 @@ class Template(object):
             'babel-core', 'babel-loader', 'babel-preset-env',
             'extract-text-webpack-plugin', 'css-loader', 'style-loader',
         ]
-        if webpack_mode == WEBPACK_MODE_CLASSIC:
-            pass
         if webpack_mode == WEBPACK_MODE_SEPARATE:
-            libs += ['vue']
             dev_libs += ['html-webpack-plugin']
-        if webpack_mode == WEBPACK_MODE_RADICAL:
-            libs = ['vue']
+        if self.has_vue:
+            libs += ['vue']
+            dev_libs += ['vue-loader', 'vue-template-compiler']
 
         def _lib_row(lib):
             return '"' + lib + '": ' + '"' + JS_LIB_VERS[lib] + '"'
