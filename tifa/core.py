@@ -173,8 +173,8 @@ class Template(object):
 
     def gen_confs(self):
         files = [
-            File(name='dev_settings.py',
-                 origin='conf/dev_settings.py.j2',
+            File(name='base_settings.py',
+                 origin='conf/base_settings.py.j2',
                  params=dict(has_assets=self.has_assets))
         ]
         domain = '<domain>'

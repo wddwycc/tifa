@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 {% if routes %}
 from . import routes
@@ -16,10 +18,8 @@ def create_app():
     model.init_app(app)
 {% endif %}
 
-    import os
-
-    dev_config = os.path.join(app.root_path, '../conf/dev_settings.py')
-    app.config.from_pyfile(dev_config)
+    base_settings = os.path.join(app.root_path, '../conf/base_settings.py')
+    app.config.from_pyfile(base_settings)
 {% if has_assets %}
 
     import json

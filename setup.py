@@ -43,7 +43,7 @@ class PublishCommand(Command):
 
 setup(
     name='tifa',
-    version='0.2.7',
+    version='0.2.8',
     packages=['tifa'],
     install_requires=[
         'click==6.7',
