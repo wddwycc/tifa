@@ -149,7 +149,7 @@ class Template(object):
             module_folders.append(flask_template_folder)
 
         config = self.config
-        name = config['name']
+        name = self.name
         routes = config.get('routes')
         models = config.get('models')
         return Folder(
@@ -166,7 +166,6 @@ class Template(object):
         ), requirements
 
     def gen_confs(self):
-        confs = self.confs
         files = [
             File(name='dev_settings.py',
                  origin='conf/dev_settings.py.j2',
@@ -174,21 +173,23 @@ class Template(object):
         ]
         domain = '<domain>'
         port = '<port>'
-        if 'supervisor' in confs:
-            files.append(File(
-                name='supervisor.conf', origin='conf/supervisor.conf.j2',
-                params=dict(name=self.config['name'])
-            ))
-        if 'gunicorn' in confs:
-            files.append(File(
-                name='gunicorn_conf.py', origin='conf/gunicorn_conf.py.j2',
-                params=dict(port=port)
-            ))
-        if 'nginx' in confs:
-            files.append(File(
-                name='nginx.conf', origin='conf/nginx.conf.j2',
-                params=dict(domain=domain, port=port)
-            ))
+        confs = self.confs
+        if confs:
+            if 'supervisor' in confs:
+                files.append(File(
+                    name='supervisor.conf', origin='conf/supervisor.conf.j2',
+                    params=dict(name=self.name)
+                ))
+            if 'gunicorn' in confs:
+                files.append(File(
+                    name='gunicorn_conf.py', origin='conf/gunicorn_conf.py.j2',
+                    params=dict(port=port)
+                ))
+            if 'nginx' in confs:
+                files.append(File(
+                    name='nginx.conf', origin='conf/nginx.conf.j2',
+                    params=dict(domain=domain, port=port)
+                ))
         webpack_mode = self.webpack_mode
         if webpack_mode == WEBPACK_MODE_DISABLE:
             return Folder(name='conf', files=files)
@@ -234,7 +235,7 @@ class Template(object):
         return File(
             name='package.json',
             origin='package.json.j2',
-            params=dict(libs=libs, dev_libs=dev_libs, name=self.config['name'])
+            params=dict(libs=libs, dev_libs=dev_libs, name=self.name)
         )
 
     def gen_fn_folder(self):
@@ -263,9 +264,8 @@ class Template(object):
         )
 
     def render(self, path):
-        config = self.config
-        name = config['name']
-        models = config.get('models')
+        name = self.name
+        models = self.models
         module_folder, requirements = self.gen_py_module()
         root_folders = [module_folder]
         conf_folder = self.gen_confs()
