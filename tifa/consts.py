@@ -2,6 +2,7 @@ PY_LIB_VERS = {
     'click': '6.7',
     'Flask': '0.12.2',
     'Flask-SQLAlchemy': '2.2',
+    'PyMySQL': '0.7.11',
     'Jinja2': '2.9.6',
     'SQLAlchemy': '1.1.14',
 }

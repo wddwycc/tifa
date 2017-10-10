@@ -143,7 +143,7 @@ class Template(object):
 
         model_folder = self.gen_models()
         if model_folder:
-            requirements += ['SQLAlchemy', 'Flask-SQLAlchemy']
+            requirements += ['SQLAlchemy', 'PyMySQL', 'Flask-SQLAlchemy']
             module_folders.append(model_folder)
 
         routes_folder = self.gen_routes()
