@@ -11,15 +11,16 @@ from . import model
 
 def create_app():
     app = Flask(__name__)
+
+    base_settings = os.path.join(app.root_path, '../conf/base_settings.py')
+    app.config.from_pyfile(base_settings)
+
 {% if routes %}
     routes.init_app(app)
 {% endif %}
 {% if models %}
     model.init_app(app)
 {% endif %}
-
-    base_settings = os.path.join(app.root_path, '../conf/base_settings.py')
-    app.config.from_pyfile(base_settings)
 {% if has_assets %}
 
     import json
