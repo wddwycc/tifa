@@ -136,4 +136,4 @@ venv.bak/
 .idea/
 .pytest_cache/
 tifa.yaml
-sample/
+example/
