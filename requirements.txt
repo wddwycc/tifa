@@ -1,7 +1,0 @@
-click==6.7
-Flask==0.12.2
-Jinja2==2.9.6
-twine==1.9.1
-PyYAML==3.12
-voluptuous==0.10.5
-pytest==3.2.2

@@ -1,5 +1,5 @@
 simulate:
-	rm tifa.yaml
+	rm -f tifa.yaml
 	rm -rf sample
 	@python -m tifa init --name sample
-	@python -m tifa gen -f
+	@python -m tifa gen
