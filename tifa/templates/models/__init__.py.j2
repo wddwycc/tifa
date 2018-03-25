@@ -1,6 +1,6 @@
 from .base import db
-{% for captal, underscore in models %}
-from .{{ under_score }} import {{ captal }}
+{% for cls, underscore in models %}
+from .{{ under_score }} import {{ cls }}
 {% endfor %}
 
 

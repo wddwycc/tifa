@@ -4,7 +4,6 @@ from shutil import copyfile
 from jinja2 import Template as JTemplate
 
 from tifa.consts import (
-    PY_LIB_VERS,
     JS_LIB_VERS,
 
     WEBPACK_MODE_DISABLE,
@@ -13,6 +12,7 @@ from tifa.consts import (
     WEBPACK_MODE_RADICAL,
 )
 from tifa.filters import underscore
+from tifa.utils import isalpha
 
 here = os.path.abspath(os.path.dirname(__file__))
 _template_root = os.path.join(here, 'templates')
@@ -259,11 +259,11 @@ class Template(object):
 
     @staticmethod
     def gen_py_lib_file(libs):
-        """Generate python requirements.txt"""
-        libs = [x + '==' + PY_LIB_VERS[x] for x in libs]
+        """Generate Pipfile"""
+        libs = [x if isalpha(x) else '"' + x + '"' for x in libs]
         return File(
-            name='requirements.txt',
-            origin='requirements.txt.j2',
+            name='Pipfile',
+            origin='Pipfile.j2',
             params=dict(libs=libs)
         )
 
