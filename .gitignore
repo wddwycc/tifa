@@ -134,5 +134,6 @@ venv.bak/
 # End of https://www.gitignore.io/api/macos,python
 
 .idea/
+.pytest_cache/
 tifa.yaml
 sample/
