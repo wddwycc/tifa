@@ -40,7 +40,7 @@ def gen(config):
         return
 
     if os.path.isdir(config['name']):
-        Prompt.warn('ops, project folder name has been used')
+        Prompt.warn('ops, folder {} has been used'.format(config['name']))
         return
 
     template = Template(config)
