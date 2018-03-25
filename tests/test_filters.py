@@ -1,6 +1,6 @@
-from tifa.filters import under_score
+from tifa.filters import underscore
 
 
-def test_under_score_filter():
-    assert under_score('Hello') == 'hello'
-    assert under_score('HelloWorld') == 'hello_world'
+def test_underscore():
+    assert underscore('Hello') == 'hello'
+    assert underscore('HelloWorld') == 'hello_world'

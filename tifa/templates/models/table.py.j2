@@ -3,6 +3,5 @@ from sqlalchemy import Column
 from sqlalchemy import Integer
 
 
-class {{ cls_name }}(db.Model):
-    __tablename__ = '{{ table_name }}'
+class {{ cls }}(db.Model):
     id = Column(Integer, primary_key=True)
