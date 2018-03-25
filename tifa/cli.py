@@ -31,8 +31,7 @@ def init(name):
     '--config', '-c', type=click.Path(exists=True),
     help='Specific configuration file path',
 )
-@click.option('--factory', '-f', is_flag=True)
-def gen(config, factory):
+def gen(config):
     config_path = config or './tifa.yaml'
     try:
         config = normalize_config(config_path)
@@ -47,7 +46,6 @@ def gen(config, factory):
     template = Template(config)
     template.render('./')
 
-    if not factory:
-        os.remove(config_path)
+    os.remove(config_path)
 
-    Prompt.success('project {} generated, enjoy coding'.format(config['name']))
+    Prompt.success('🎉 {} created, enjoy coding!'.format(config['name']))

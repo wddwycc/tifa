@@ -51,17 +51,10 @@ $ tifa init
 $ tifa gen
 ```
 
-This command would read `tifa.yaml` by default. To use a specific config file:
+This command would read `./tifa.yaml` by default. To use a specific config file:
 
 ```
 $ tifa gen --config path/to/config.yaml
-```
-
-By default, tifa would remove configuration file when successfully created a project.
-If you want to keep it, add a `--factory` flag
-
-```
-$ tifa gen --factory
 ```
 
 ## Configuration Specs
