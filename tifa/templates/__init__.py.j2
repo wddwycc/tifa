@@ -5,7 +5,7 @@ from flask import Flask
 from . import routes
 {% endif %}
 {% if models %}
-from . import model
+from . import models
 {% endif %}
 
 
@@ -19,7 +19,7 @@ def create_app():
     routes.init_app(app)
 {% endif %}
 {% if models %}
-    model.init_app(app)
+    models.init_app(app)
 {% endif %}
 {% if has_assets %}
 
