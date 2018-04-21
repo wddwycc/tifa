@@ -8,13 +8,12 @@ name = "pypi"
 [packages]
 
 click = "*"
-flask = "*"
 "jinja2" = "*"
-twine = "*"
 pyyaml = "*"
 voluptuous = "*"
-pytest = "*"
 
 
 [dev-packages]
 
+pytest = "*"
+twine = "*"

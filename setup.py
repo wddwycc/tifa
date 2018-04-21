@@ -47,9 +47,9 @@ setup(
     packages=['tifa'],
     install_requires=[
         'click==6.7',
-        'Jinja2==2.9.6',
+        'Jinja2==2.10',
         'PyYAML==3.12',
-        'voluptuous==0.10.5',
+        'voluptuous==0.11.1',
     ],
     tests_require=['pytest==3.2.2'],
     include_package_data=True,
